@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>母带处理工具 - 山野风格版</title>
     <style>
+        /* 原有CSS样式保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -719,7 +720,11 @@
     </div>
 
     <script>
-        // 密码验证
+        // 设置正确密码
+        const correctPassword = 'syyy8090';
+        // 本地存储键名
+        const STORAGE_KEY = 'audioMastering_authenticated';
+        
         document.addEventListener('DOMContentLoaded', () => {
             const passwordOverlay = document.getElementById('passwordOverlay');
             const passwordInput = document.getElementById('passwordInput');
@@ -727,15 +732,29 @@
             const passwordError = document.getElementById('passwordError');
             const mainContent = document.getElementById('mainContent');
             
-            // 设置正确密码
-            const correctPassword = 'syyy8090';
+            // 检查是否已经验证过
+            const isAuthenticated = localStorage.getItem(STORAGE_KEY);
+            
+            if (isAuthenticated === 'true') {
+                // 如果已经验证过，直接显示主内容
+                passwordOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
+                initializeApp();
+            } else {
+                // 如果没有验证过，显示密码层
+                passwordOverlay.style.display = 'flex';
+                passwordInput.focus();
+            }
             
             // 密码验证函数
             function checkPassword() {
                 const enteredPassword = passwordInput.value;
                 
                 if (enteredPassword === correctPassword) {
-                    // 密码正确，隐藏密码层，显示主内容
+                    // 密码正确，保存验证状态到本地存储
+                    localStorage.setItem(STORAGE_KEY, 'true');
+                    
+                    // 隐藏密码层，显示主内容
                     passwordOverlay.style.display = 'none';
                     mainContent.style.display = 'block';
                     
@@ -769,9 +788,6 @@
                     checkPassword();
                 }
             });
-            
-            // 初始焦点在密码输入框
-            passwordInput.focus();
         });
         
         // 初始化应用（原代码中的功能）
