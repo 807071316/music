@@ -715,7 +715,7 @@
         let currentZone = 'instrumental'; // 'instrumental' 或 'vocal'
         let currentPreset = 'standard'; // 每个专区各自的预设
         
-        // 预设配置
+        // 预设配置 - 人声专区参数已改为与纯音乐专区相同
         const presetConfigs = {
             instrumental: {
                 standard: {
@@ -736,17 +736,17 @@
             vocal: {
                 standard: {
                     name: "标准优化",
-                    description: "针对人声音频的基本优化",
-                    speed: 0.99,
-                    pitch: 0, // 音高调整为0
-                    treble: 25
+                    description: "平衡音质和检测通过率，适合大多数人声音频",
+                    speed: 0.98,
+                    pitch: 2,
+                    treble: 30
                 },
                 enhanced: {
                     name: "增强优化",
-                    description: "更强的人声音频优化",
-                    speed: 0.97,
-                    pitch: 0, // 音高调整为0
-                    treble: 35
+                    description: "更强的优化效果，适合较难通过检测的人声音频",
+                    speed: 0.96,
+                    pitch: 3,
+                    treble: 40
                 }
             }
         };
