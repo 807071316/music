@@ -217,13 +217,13 @@
             line-height: 1.5;
         }
         
-        .coming-soon {
+        .beta-tag {
             position: absolute;
             top: 20px;
             right: 20px;
-            background-color: #ff6b6b;
-            color: white;
-            padding: 5px 10px;
+            background-color: #ffc107;
+            color: #1b4332;
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: bold;
@@ -539,17 +539,17 @@
         </div>
         
         <div class="zone-selector">
-            <div class="zone-card disabled" id="vocalZone">
-                <div class="coming-soon">即将推出</div>
+            <div class="zone-card" id="vocalZone">
+                <div class="beta-tag">内测中</div>
                 <div class="zone-icon vocal-icon">
                     <i class="fas fa-microphone-alt"></i>
                 </div>
-                <h3 class="zone-title">带人声专区</h3>
-                <p class="zone-description">专门优化带人声音频，使其通过AI检测平台。采用多重处理技术，在保持音质的同时模拟人类演唱特征。</p>
+                <h3 class="zone-title">人声专区</h3>
+                <p class="zone-description">内测中，功能尚不完善，请谨慎使用。专门优化带人声音频，使其通过AI检测平台。</p>
                 <div class="preset-selector">
                     <div class="preset-buttons">
-                        <button class="preset-btn" disabled>标准优化</button>
-                        <button class="preset-btn" disabled>深度优化</button>
+                        <button class="preset-btn active" id="vocalStandardPreset">标准优化</button>
+                        <button class="preset-btn" id="vocalEnhancedPreset">增强优化</button>
                     </div>
                 </div>
             </div>
@@ -712,23 +712,42 @@
         let audioContext;
         let audioBuffer;
         let processedAudioBuffer;
-        let currentPreset = 'standard'; // 'standard' 或 'enhanced'
+        let currentZone = 'instrumental'; // 'instrumental' 或 'vocal'
+        let currentPreset = 'standard'; // 每个专区各自的预设
         
         // 预设配置
         const presetConfigs = {
-            standard: {
-                name: "标准优化",
-                description: "平衡音质和检测通过率，适合大多数纯音乐",
-                speed: 0.98,
-                pitch: 2,
-                treble: 30
+            instrumental: {
+                standard: {
+                    name: "标准优化",
+                    description: "平衡音质和检测通过率，适合大多数纯音乐",
+                    speed: 0.98,
+                    pitch: 2,
+                    treble: 30
+                },
+                enhanced: {
+                    name: "增强优化",
+                    description: "更强的优化效果，适合较难通过检测的音频",
+                    speed: 0.96,
+                    pitch: 3,
+                    treble: 40
+                }
             },
-            enhanced: {
-                name: "增强优化",
-                description: "更强的优化效果，适合较难通过检测的音频",
-                speed: 0.96,
-                pitch: 3,
-                treble: 40
+            vocal: {
+                standard: {
+                    name: "标准优化",
+                    description: "针对人声音频的基本优化",
+                    speed: 0.99,
+                    pitch: 0, // 音高调整为0
+                    treble: 25
+                },
+                enhanced: {
+                    name: "增强优化",
+                    description: "更强的人声音频优化",
+                    speed: 0.97,
+                    pitch: 0, // 音高调整为0
+                    treble: 35
+                }
             }
         };
         
@@ -743,8 +762,16 @@
         // 按钮元素
         const processBtn = document.getElementById('processBtn');
         const downloadBtn = document.getElementById('downloadBtn');
+        
+        // 专区元素
+        const vocalZone = document.getElementById('vocalZone');
+        const instrumentalZone = document.getElementById('instrumentalZone');
+        
+        // 预设按钮元素
         const standardPresetBtn = document.getElementById('standardPreset');
         const enhancedPresetBtn = document.getElementById('enhancedPreset');
+        const vocalStandardPresetBtn = document.getElementById('vocalStandardPreset');
+        const vocalEnhancedPresetBtn = document.getElementById('vocalEnhancedPreset');
         
         // 状态显示
         const status = document.getElementById('status');
@@ -807,6 +834,15 @@
                 audioUpload.click();
             });
             
+            // 专区切换
+            vocalZone.addEventListener('click', function() {
+                setZone('vocal');
+            });
+            
+            instrumentalZone.addEventListener('click', function() {
+                setZone('instrumental');
+            });
+            
             // 预设按钮事件
             standardPresetBtn.addEventListener('click', function() {
                 setPreset('standard');
@@ -816,9 +852,46 @@
                 setPreset('enhanced');
             });
             
+            vocalStandardPresetBtn.addEventListener('click', function() {
+                setPreset('standard');
+            });
+            
+            vocalEnhancedPresetBtn.addEventListener('click', function() {
+                setPreset('enhanced');
+            });
+            
             // 按钮事件
             processBtn.addEventListener('click', processAudio);
             downloadBtn.addEventListener('click', downloadAudio);
+        }
+        
+        function setZone(zone) {
+            if (currentZone === zone) return;
+            
+            // 更新当前专区
+            currentZone = zone;
+            
+            // 更新专区卡片状态
+            vocalZone.classList.remove('active');
+            instrumentalZone.classList.remove('active');
+            
+            if (zone === 'vocal') {
+                vocalZone.classList.add('active');
+            } else {
+                instrumentalZone.classList.add('active');
+            }
+            
+            // 重置预设为对应专区的默认预设
+            setPreset('standard');
+            
+            showStatus(`已切换到${zone === 'vocal' ? '人声专区' : '纯音乐专区'}`, 'success');
+            
+            // 如果已有音频，重新处理
+            if (audioBuffer) {
+                setTimeout(() => {
+                    processAudio();
+                }, 500);
+            }
         }
         
         function setPreset(preset) {
@@ -827,19 +900,33 @@
             currentPreset = preset;
             
             // 更新按钮状态
-            standardPresetBtn.classList.remove('active');
-            enhancedPresetBtn.classList.remove('active');
-            
-            if (preset === 'standard') {
-                standardPresetBtn.classList.add('active');
+            // 根据当前专区更新对应的按钮
+            if (currentZone === 'instrumental') {
+                standardPresetBtn.classList.remove('active');
+                enhancedPresetBtn.classList.remove('active');
+                
+                if (preset === 'standard') {
+                    standardPresetBtn.classList.add('active');
+                } else {
+                    enhancedPresetBtn.classList.add('active');
+                }
             } else {
-                enhancedPresetBtn.classList.add('active');
+                vocalStandardPresetBtn.classList.remove('active');
+                vocalEnhancedPresetBtn.classList.remove('active');
+                
+                if (preset === 'standard') {
+                    vocalStandardPresetBtn.classList.add('active');
+                } else {
+                    vocalEnhancedPresetBtn.classList.add('active');
+                }
             }
             
             // 更新处理模式显示
-            processingMode.textContent = `纯音乐专区 - ${presetConfigs[preset].name}`;
+            const zoneName = currentZone === 'vocal' ? '人声专区' : '纯音乐专区';
+            const presetName = presetConfigs[currentZone][preset].name;
+            processingMode.textContent = `${zoneName} - ${presetName}`;
             
-            showStatus(`已切换到${presetConfigs[preset].name}模式`, 'success');
+            showStatus(`已切换到${presetName}模式`, 'success');
             
             // 如果已有音频，重新处理
             if (audioBuffer) {
@@ -945,13 +1032,13 @@
             processBtn.disabled = true;
             downloadBtn.disabled = true;
             
-            // 获取当前预设参数
-            const preset = presetConfigs[currentPreset];
+            // 获取当前专区的预设参数
+            const preset = presetConfigs[currentZone][currentPreset];
             const speed = preset.speed;
             const pitch = preset.pitch;
             const treble = preset.treble;
             
-            console.log(`开始处理，预设: ${currentPreset}, 参数: 速度=${speed}, 音高=${pitch}, 高频削减=${treble}%`);
+            console.log(`开始处理，专区: ${currentZone}, 预设: ${currentPreset}, 参数: 速度=${speed}, 音高=${pitch}, 高频削减=${treble}%`);
             
             // 使用setTimeout确保UI更新
             setTimeout(() => {
@@ -1108,8 +1195,9 @@
             const originalName = audioUpload.files[0].name;
             const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.'));
             const timestamp = new Date().getTime();
+            const zoneName = currentZone === 'vocal' ? '人声' : '纯音乐';
             const presetName = currentPreset === 'standard' ? '标准优化' : '增强优化';
-            const fileName = `${nameWithoutExt}_山野处理_${presetName}_${timestamp}.wav`;
+            const fileName = `${nameWithoutExt}_山野处理_${zoneName}_${presetName}_${timestamp}.wav`;
             
             // 创建下载链接
             const link = document.createElement('a');
