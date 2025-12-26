@@ -715,7 +715,7 @@
         let currentZone = 'instrumental'; // 'instrumental' 或 'vocal'
         let currentPreset = 'standard'; // 每个专区各自的预设
         
-        // 预设配置 - 人声专区参数已改为与纯音乐专区相同
+        // 预设配置 - 修改了人声专区的增强优化参数
         const presetConfigs = {
             instrumental: {
                 standard: {
@@ -744,9 +744,10 @@
                 enhanced: {
                     name: "增强优化",
                     description: "更强的优化效果，适合较难通过检测的人声音频",
-                    speed: 0.96,
-                    pitch: 3,
-                    treble: 40
+                    speed: 0.97,      // 修改：速度因子 0.97x
+                    pitch: 0,         // 修改：音高调整 +0 半音
+                    treble: 30,       // 修改：高频削减 30%
+                    normalization: 0  // 添加：音量标准化 0 dBFS
                 }
             }
         };
@@ -1037,8 +1038,9 @@
             const speed = preset.speed;
             const pitch = preset.pitch;
             const treble = preset.treble;
+            const normalization = preset.normalization || null; // 获取音量标准化参数
             
-            console.log(`开始处理，专区: ${currentZone}, 预设: ${currentPreset}, 参数: 速度=${speed}, 音高=${pitch}, 高频削减=${treble}%`);
+            console.log(`开始处理，专区: ${currentZone}, 预设: ${currentPreset}, 参数: 速度=${speed}, 音高=${pitch}, 高频削减=${treble}%, 音量标准化=${normalization !== null ? normalization + ' dBFS' : '无'}`);
             
             // 使用setTimeout确保UI更新
             setTimeout(() => {
@@ -1058,6 +1060,8 @@
                     for (let channel = 0; channel < numberOfChannels; channel++) {
                         const inputData = audioBuffer.getChannelData(channel);
                         const outputData = processedAudioBuffer.getChannelData(channel);
+                        
+                        let maxAmplitude = 0; // 用于音量标准化
                         
                         // 应用速度变化（重采样）
                         for (let i = 0; i < length; i++) {
@@ -1097,11 +1101,39 @@
                                 }
                             }
                             
-                            // 限制值在-1到1之间
-                            if (trebleAdjustedSample > 1) trebleAdjustedSample = 1;
-                            if (trebleAdjustedSample < -1) trebleAdjustedSample = -1;
+                            // 记录最大振幅用于音量标准化
+                            const absValue = Math.abs(trebleAdjustedSample);
+                            if (absValue > maxAmplitude) {
+                                maxAmplitude = absValue;
+                            }
                             
                             outputData[i] = trebleAdjustedSample;
+                        }
+                        
+                        // 应用音量标准化 (0 dBFS)
+                        if (normalization !== null) {
+                            // 计算增益因子：如果最大振幅为0，则不调整
+                            if (maxAmplitude > 0) {
+                                // 对于0 dBFS，将最大振幅调整到1.0
+                                const gain = 1.0 / maxAmplitude;
+                                
+                                // 应用增益调整，确保不超过1.0
+                                for (let i = 0; i < length; i++) {
+                                    outputData[i] = outputData[i] * gain;
+                                    
+                                    // 确保值在-1到1之间
+                                    if (outputData[i] > 1) outputData[i] = 1;
+                                    if (outputData[i] < -1) outputData[i] = -1;
+                                }
+                                
+                                console.log(`声道 ${channel} 应用音量标准化，增益因子: ${gain.toFixed(4)}`);
+                            }
+                        } else {
+                            // 如果没有音量标准化，确保值在-1到1之间
+                            for (let i = 0; i < length; i++) {
+                                if (outputData[i] > 1) outputData[i] = 1;
+                                if (outputData[i] < -1) outputData[i] = -1;
+                            }
                         }
                     }
                     
