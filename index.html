@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>山野音乐工具 | 创作源于自然，音乐回归山野</title>
+    <title>山野音乐 | 创作源于自然，音乐回归山野</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -21,6 +21,7 @@
             --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
             --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.2);
             --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --orange-gradient: linear-gradient(135deg, #ff7e5f, #feb47b);
         }
 
         * {
@@ -134,16 +135,57 @@
             background-color: rgba(201, 169, 89, 0.1);
         }
 
-        .btn-disabled {
-            background: linear-gradient(135deg, #555, #777);
-            color: #ccc;
-            cursor: not-allowed;
-            opacity: 0.7;
+        /* 新增：立即创作按钮样式 */
+        .btn-creation {
+            background: var(--orange-gradient);
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.3);
+        }
+        
+        .btn-creation:hover {
+            box-shadow: 0 10px 25px rgba(255, 126, 95, 0.5);
+        }
+        
+        .btn-creation::before {
+            background: linear-gradient(135deg, #feb47b, #ff7e5f);
         }
 
-        .btn-disabled:hover {
-            transform: none;
-            box-shadow: 0 5px 15px rgba(42, 92, 61, 0.3);
+        /* 新增：创作者统计样式 */
+        .creator-stats {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: var(--accent-light);
+            text-align: center;
+            position: relative;
+        }
+        
+        .creator-stats::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: calc(50% - 120px);
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201, 169, 89, 0.3));
+        }
+        
+        .creator-stats::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: calc(50% - 120px);
+            height: 1px;
+            background: linear-gradient(to left, transparent, rgba(201, 169, 89, 0.3));
+        }
+        
+        .creator-count {
+            color: var(--accent-gold);
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: inline-block;
+            margin: 0 5px;
+            text-shadow: 0 0 10px rgba(201, 169, 89, 0.3);
         }
 
         /* 导航栏 */
@@ -528,12 +570,69 @@
         /* 页脚 */
         footer {
             background-color: var(--text-dark);
-            padding: 30px 0;
+            padding: 80px 0 30px;
             position: relative;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-gold);
+        }
+
+        .footer-about p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .footer-links h4, .footer-contact h4 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-gold);
+            padding-left: 5px;
         }
 
         .copyright {
             text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.9rem;
         }
@@ -559,6 +658,11 @@
             
             .poster-container {
                 max-height: 500px;
+            }
+            
+            .creator-stats::before,
+            .creator-stats::after {
+                width: calc(50% - 100px);
             }
         }
 
@@ -623,6 +727,11 @@
             .poster-container {
                 max-height: 400px;
             }
+            
+            .creator-stats::before,
+            .creator-stats::after {
+                width: calc(50% - 80px);
+            }
         }
 
         @media (max-width: 576px) {
@@ -642,8 +751,25 @@
                 padding: 30px 20px;
             }
             
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
             .poster-container {
                 max-height: 350px;
+            }
+            
+            .creator-stats {
+                font-size: 1rem;
+            }
+            
+            .creator-count {
+                font-size: 1.1rem;
+            }
+            
+            .creator-stats::before,
+            .creator-stats::after {
+                display: none;
             }
         }
     </style>
@@ -654,15 +780,15 @@
         <div class="container">
             <nav class="navbar">
                 <a href="#" class="logo">
-                    <img src="images/logo.jpg" alt="山野音乐工具Logo" class="logo-img">
-                    <span>山野音乐工具</span>
+                    <img src="images/logo.jpg" alt="山野音乐Logo" class="logo-img">
+                    <span>山野音乐</span>
                 </a>
                 
                 <ul class="nav-links">
                     <li><a href="#home">首页</a></li>
                     <li><a href="#tools">音乐工具</a></li>
-                    <li><a href="#ad-contact">联系我</a></li>
-                    <li><a href="#footer">关于我</a></li>
+                    <li><a href="#ad-contact">联系我们</a></li>
+                    <li><a href="#footer">关于我们</a></li>
                 </ul>
                 
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -677,14 +803,21 @@
         <div class="hero-bg"></div>
         <div class="container">
             <div class="hero-content">
-                <h1>山野音乐工具</h1>
-                <p>我致力于将自然的灵感与音乐创作相结合，提供一系列实用工具，帮助音乐人从山野中汲取灵感，创作出富有生命力的音乐作品。</p>
+                <h1>山野音乐</h1>
+                <p>我们致力于将自然的灵感与音乐创作相结合，提供一系列实用工具，帮助音乐人从山野中汲取灵感，创作出富有生命力的音乐作品。</p>
                 
                 <div class="slogan">创作源于自然，音乐回归山野</div>
                 
+                <!-- 添加立即创作按钮和创作者统计 -->
+                <a href="https://shanyeai.com/" target="_blank" class="btn btn-creation">立即创作</a>
+                
+                <div class="creator-stats">
+                    <span class="creator-count">365,986</span> 创作者们都在使用我们！
+                </div>
+                
                 <div class="hero-btns">
                     <a href="#tools" class="btn">探索工具</a>
-                    <a href="#ad-contact" class="btn btn-outline" style="display: none;">联系我</a>
+                    <a href="#ad-contact" class="btn btn-outline">联系我们</a>
                 </div>
             </div>
         </div>
@@ -693,8 +826,8 @@
     <!-- 工具区域 -->
     <section class="tools" id="tools">
         <div class="container">
-            <h2 class="section-title">我的音乐工具</h2>
-            <p class="section-subtitle">以下是我精心开发的工具集合，全部免费使用。每个工具都融入了自然元素，帮助您创作出独特的音乐作品。</p>
+            <h2 class="section-title">我们的音乐工具</h2>
+            <p class="section-subtitle">以下是我们精心开发的工具集合，全部免费使用。每个工具都融入了自然元素，帮助您创作出独特的音乐作品。</p>
             
             <div class="tools-grid">
                 <!-- 工具1 - 现有工具 -->
@@ -767,26 +900,26 @@
                     <a href="山野-母带处理工具v1.0.html" class="btn">打开工具</a>
                 </div>
                 
-                <!-- 工具6 - 计划中工具 -->
+                <!-- 工具6 - 专业音频音质处理工作站 -->
                 <div class="tool-card">
                     <div class="tool-icon">
-                        <i class="fas fa-tree"></i>
+                        <i class="fas fa-headphones"></i>
                     </div>
                     <div class="tool-tags">
-                        <span class="tool-tag disabled">即将推出</span>
-                        <span class="tool-tag">环境音作曲</span>
+                        <span class="tool-tag">专业音频</span>
+                        <span class="tool-tag">音质处理</span>
+                        <span class="tool-tag">工作站</span>
                     </div>
-                    <h3>环境音作曲助手</h3>
-                    <p>智能作曲助手，根据您选择的自然环境类型，推荐合适的和弦、节奏和旋律。涵盖森林、溪流、山脉等多种环境。</p>
-                    <div class="tool-status">更新中...</div>
-                    <a href="#" class="btn btn-disabled">打开工具（更新中..）</a>
+                    <h3>山野专业音频音质处理工作站v1.0</h3>
+                    <p>全面的音频音质处理工作站，提供音频编辑、修复、增强和优化功能。支持多种音频格式，帮助您将音频质量提升至专业水准。</p>
+                    <a href="山野专业音频音质处理工作站v1.0.html" class="btn">打开工具</a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 广告/联系区域 -->
-    <section class="ad-contact" id="ad-contact" style="display: none;">
+    <section class="ad-contact" id="ad-contact">
         <div class="container">
             <h2 class="section-title">联系我们 & 合作推广</h2>
             <p class="section-subtitle">欢迎与我们联系，获取最新工具更新、合作机会或参加我们的山野音乐活动。扫描二维码关注官方微信，获取更多资讯。</p>
@@ -839,8 +972,37 @@
     <!-- 页脚 -->
     <footer id="footer">
         <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="images/logo.jpg" alt="山野音乐Logo" class="footer-logo-img">
+                        <span>山野音乐</span>
+                    </div>
+                    <p>创作源于自然，音乐回归山野。我们致力于将自然的灵感与音乐创作相结合，提供一系列实用工具，帮助音乐人从山野中汲取灵感。</p>
+                    <p>本网站所有工具仅供学习和创作使用。</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#tools">音乐工具</a></li>
+                        <li><a href="#ad-contact">联系我们</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                        <li><a href="#">使用条款</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>联系信息</h4>
+                    <p><i class="fab fa-weixin" style="margin-right: 10px;"></i> syyy8090（徐老师）</p>
+                    <p><i class="fab fa-weixin" style="margin-right: 10px;"></i> h16608851518（黄老师）</p>
+                    <p><i class="fas fa-envelope" style="margin-right: 10px;"></i> 807071316@qq.com</p>
+                </div>
+            </div>
+            
             <div class="copyright">
-                <p>© 2026 山野音乐工具 版权所有 | <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">蜀ICP备 2025177668号</a></p>
+                <p>© 2026 山野音乐 版权所有 | 蜀ICP备 2025177668号</p>
                 <p>本网站设计灵感来源于自然与现代音乐的融合</p>
             </div>
         </div>
@@ -896,7 +1058,7 @@
         images.forEach(img => {
             img.addEventListener('error', function() {
                 if (this.src.includes('logo.jpg')) {
-                    this.src = 'https://via.placeholder.com/50/2a5c3d/ffffff?text=山野音乐工具';
+                    this.src = 'https://via.placeholder.com/50/2a5c3d/ffffff?text=山野音乐';
                 } else if (this.src.includes('poster.jpg')) {
                     this.parentElement.innerHTML = `
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #666; font-size: 1.2rem;">
