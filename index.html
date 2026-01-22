@@ -149,6 +149,77 @@
             background: linear-gradient(135deg, #feb47b, #ff7e5f);
         }
 
+        /* 新增：SKY-AI实验室按钮样式 */
+        .creation-tools-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-sky-ai {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #8A2BE2, #4B0082); /* 紫色到深紫色渐变 */
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            min-width: 220px;
+        }
+
+        .btn-sky-ai:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.5);
+        }
+
+        .btn-sky-ai::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #9B30FF, #8A2BE2);
+            transition: left 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-sky-ai:hover::before {
+            left: 0;
+        }
+
+        .sky-ai-content {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.3;
+            text-align: left;
+            margin-right: 10px;
+        }
+
+        .sky-ai-main {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: white;
+        }
+
+        .sky-ai-sub {
+            font-size: 0.85em;
+            opacity: 0.9;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
         /* 新增：创作者统计样式 */
         .creator-stats {
             margin-top: 20px;
@@ -720,6 +791,22 @@
                 margin-bottom: 15px;
             }
             
+            .creation-tools-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-sky-ai, .btn-creation {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .sky-ai-content {
+                text-align: center;
+                margin-right: 0;
+            }
+            
             section {
                 padding: 70px 0;
             }
@@ -808,8 +895,16 @@
                 
                 <div class="slogan">创作源于自然，音乐回归山野</div>
                 
-                <!-- 修改后的立即创作按钮 -->
-                <a href="https://music.shanyeai.com/pc/35/" target="_blank" class="btn btn-creation">立即创作</a>
+                <!-- 立即创作按钮和SKY-AI实验室入口 -->
+                <div class="creation-tools-container">
+                    <a href="https://music.shanyeai.com/pc/35/" target="_blank" class="btn btn-creation">立即创作</a>
+                    <a href="https://sky.suno8.com" class="btn btn-sky-ai">
+                        <div class="sky-ai-content">
+                            <span class="sky-ai-main">SKY-AI实验室</span>
+                            <span class="sky-ai-sub">AI音乐重塑工具</span>
+                        </div>
+                    </a>
+                </div>
                 
                 <div class="creator-stats">
                     <span class="creator-count">365,986</span> 创作者们都在使用我们！
